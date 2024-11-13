@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.API.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20241111142418_Initial")]
+    [Migration("20241112122118_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Auth.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("iden")
+                .HasDefaultSchema("asp_net_identity")
                 .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -47,51 +47,40 @@ namespace Auth.API.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("user_id");
+
+                    b.Property<string>("UserId1")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)")
+                        .HasColumnName("user_id1");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("login_histories", "iden");
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("asp_net_login_histories", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Auth.API.Entities.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("id");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer")
                         .HasColumnName("access_failed_count");
 
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("date")
-                        .HasColumnName("birth_date");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasMaxLength(36)
                         .HasColumnType("character varying(36)")
                         .HasColumnName("concurrency_stamp");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("deleted_by");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -102,24 +91,6 @@ namespace Auth.API.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean")
                         .HasColumnName("email_confirmed");
-
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("first_name");
-
-                    b.Property<bool?>("Gender")
-                        .HasColumnType("boolean")
-                        .HasColumnName("gender");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("LastName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("last_name");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean")
@@ -154,10 +125,9 @@ namespace Auth.API.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("phone_number_confirmed");
 
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
-                        .HasColumnName("profile_picture_url");
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("registration_date");
 
                     b.Property<string>("SecurityStamp")
                         .HasMaxLength(256)
@@ -167,14 +137,6 @@ namespace Auth.API.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean")
                         .HasColumnName("two_factor_enabled");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("updated_by");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_date");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(50)
@@ -190,7 +152,56 @@ namespace Auth.API.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("users", "iden");
+                    b.ToTable("asp_net_users", "asp_net_identity");
+                });
+
+            modelBuilder.Entity("Auth.API.Entities.UserDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("date")
+                        .HasColumnName("birth_date");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("first_name");
+
+                    b.Property<bool?>("Gender")
+                        .HasColumnType("boolean")
+                        .HasColumnName("gender");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("profile_picture_url");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("asp_net_user_details", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -220,7 +231,7 @@ namespace Auth.API.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("asp_net_roles", "iden");
+                    b.ToTable("asp_net_roles", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -249,7 +260,7 @@ namespace Auth.API.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("asp_net_role_claims", "iden");
+                    b.ToTable("asp_net_role_claims", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -271,14 +282,14 @@ namespace Auth.API.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("asp_net_user_claims", "iden");
+                    b.ToTable("asp_net_user_claims", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -297,20 +308,20 @@ namespace Auth.API.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("user_id");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("asp_net_user_logins", "iden");
+                    b.ToTable("asp_net_user_logins", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("text")
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("user_id");
 
                     b.Property<string>("RoleId")
@@ -321,13 +332,13 @@ namespace Auth.API.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("asp_net_user_roles", "iden");
+                    b.ToTable("asp_net_user_roles", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("text")
+                        .HasColumnType("character varying(36)")
                         .HasColumnName("user_id");
 
                     b.Property<string>("LoginProvider")
@@ -344,7 +355,7 @@ namespace Auth.API.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("asp_net_user_tokens", "iden");
+                    b.ToTable("asp_net_user_tokens", "asp_net_identity");
                 });
 
             modelBuilder.Entity("Auth.API.Entities.LoginHistory", b =>
@@ -354,6 +365,25 @@ namespace Auth.API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Auth.API.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Auth.API.Entities.UserDetail", b =>
+                {
+                    b.HasOne("Auth.API.Entities.User", "User")
+                        .WithOne("UserDetail")
+                        .HasForeignKey("Auth.API.Entities.UserDetail", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -410,6 +440,8 @@ namespace Auth.API.Migrations
             modelBuilder.Entity("Auth.API.Entities.User", b =>
                 {
                     b.Navigation("LoginHistories");
+
+                    b.Navigation("UserDetail");
                 });
 #pragma warning restore 612, 618
         }

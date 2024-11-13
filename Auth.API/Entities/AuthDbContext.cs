@@ -7,6 +7,9 @@ namespace Auth.API.Entities
     {
         public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 
+        public DbSet<LoginHistory> LoginHistories { get; set; }
+        public DbSet<UserDetail> UserDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -15,6 +18,7 @@ namespace Auth.API.Entities
             {
                 entity.ToTable("asp_net_users");
 
+                entity.Property(u => u.Id).HasMaxLength(36);
                 entity.Property(u => u.UserName).HasMaxLength(50);
                 entity.Property(u => u.NormalizedUserName).HasMaxLength(50);
                 entity.Property(u => u.Email).HasMaxLength(100).IsRequired();
@@ -23,11 +27,11 @@ namespace Auth.API.Entities
                 entity.Property(u => u.SecurityStamp).HasMaxLength(256);
                 entity.Property(u => u.ConcurrencyStamp).IsConcurrencyToken().HasMaxLength(36);
                 entity.Property(u => u.PhoneNumber).HasMaxLength(15);
-                entity.Property(u => u.FirstName).HasMaxLength(50);
-                entity.Property(u => u.LastName).HasMaxLength(50);
-                entity.Property(u => u.ProfilePictureUrl).HasMaxLength(2048);
-                entity.Property(u => u.BirthDate).HasColumnType("date");
-                entity.Property(u => u.CreatedDate).IsRequired();
+                
+                entity.HasOne(u => u.UserDetail)
+                      .WithOne(u => u.User)
+                      .HasForeignKey<UserDetail>(d => d.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(u => u.LoginHistories)
                       .WithOne()
@@ -35,18 +39,29 @@ namespace Auth.API.Entities
                       .OnDelete(DeleteBehavior.Cascade);
             });
             
+            builder.Entity<UserDetail>(entity =>
+            {
+                entity.ToTable("asp_net_user_details");
+
+                entity.Property(u => u.UserId).HasMaxLength(36);
+                entity.Property(u => u.FirstName).HasMaxLength(50);
+                entity.Property(u => u.LastName).HasMaxLength(50);
+                entity.Property(u => u.ProfilePictureUrl).HasMaxLength(2048);
+                entity.Property(u => u.BirthDate).HasColumnType("date");
+            });
+
             builder.Entity<LoginHistory>(entity =>
             {
-                entity.ToTable("asp_net_login_logs");
+                entity.ToTable("asp_net_login_histories");
+
+                entity.Property(u => u.UserId).HasMaxLength(36);
+                entity.Property(l => l.LoginDate).IsRequired();
 
                 entity.Property(l => l.IpAddress)
                       .HasMaxLength(45)
                       .IsRequired();
-
-                entity.Property(l => l.LoginDate)
-                      .IsRequired();
             });
-            
+
             builder.HasDefaultSchema("asp_net_identity");
 
             builder.UseSnakeCase();

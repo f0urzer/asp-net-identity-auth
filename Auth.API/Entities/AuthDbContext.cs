@@ -7,7 +7,6 @@ namespace Auth.API.Entities
     {
         public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 
-        public DbSet<LoginHistory> LoginHistories { get; set; }
         public DbSet<UserDetail> UserDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -32,11 +31,6 @@ namespace Auth.API.Entities
                       .WithOne(u => u.User)
                       .HasForeignKey<UserDetail>(d => d.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasMany(u => u.LoginHistories)
-                      .WithOne()
-                      .HasForeignKey(l => l.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
             });
             
             builder.Entity<UserDetail>(entity =>
@@ -48,18 +42,6 @@ namespace Auth.API.Entities
                 entity.Property(u => u.LastName).HasMaxLength(50);
                 entity.Property(u => u.ProfilePictureUrl).HasMaxLength(2048);
                 entity.Property(u => u.BirthDate).HasColumnType("date");
-            });
-
-            builder.Entity<LoginHistory>(entity =>
-            {
-                entity.ToTable("asp_net_login_histories");
-
-                entity.Property(u => u.UserId).HasMaxLength(36);
-                entity.Property(l => l.LoginDate).IsRequired();
-
-                entity.Property(l => l.IpAddress)
-                      .HasMaxLength(45)
-                      .IsRequired();
             });
 
             builder.HasDefaultSchema("asp_net_identity");

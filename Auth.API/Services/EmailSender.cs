@@ -35,7 +35,7 @@ namespace Auth.API.Services
             }
             catch (Exception ex)
             {
-                logger.LogError($"Email sending failed: {ex.Message}");
+                logger.LogError($"EMAIL SENDING FAILED: {ex.Message}");
             }
         }
     }

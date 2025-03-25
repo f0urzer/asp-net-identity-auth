@@ -10,7 +10,7 @@ namespace Auth.API.Extensions
             services.Configure<IdentityOptions>(options =>
             {
                 options.User.RequireUniqueEmail = true;
-                //options.Stores.ProtectPersonalData = true;
+                options.Stores.ProtectPersonalData = true;
                 options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedAccount = true;
             });

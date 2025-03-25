@@ -7,6 +7,5 @@ namespace Auth.API.Entities
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
         
         public UserDetail? UserDetail { get; set; }
-        public List<LoginHistory>? LoginHistories { get; set; }
     }
 }
